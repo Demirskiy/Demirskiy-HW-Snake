@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Collections.Generic;
+
+
 
 namespace Snake
 {
@@ -11,7 +14,6 @@ namespace Snake
             int length = 80;
             
             Field(hight, length);
-            //FoodGen(hight, length);
             SnakeMovement(hight, length);
             
          
@@ -76,29 +78,31 @@ namespace Snake
         {   
             int x = 25;
             int y = 10;
-            int xErase = default;
-            int yErase = default;
-            int snakeLenght = 0;
+            int count = 0;
+            int levelSpeed = 300;
+            int levelCount = 0;
+            int level = 0;
+
+            int snakeLength = 0;
             bool left = false;
             bool right = false;
             bool up = false;
-            bool down = false;            
-            int[,]snakeLenghtCoord = new int[2,50];
+            bool down = false;
+            var snakeCoordX = new List<int>();
+            var snakeCoordY = new List<int>();
             int[,] foodCoord = new int[2,1];
             ConsoleKey keyPressed = default;
            foodCoord = FoodGen(hight,length);
             while (true)
             {
-                //Console.SetCursorPosition(0, 0);
+                int checkMovementX = x;
+                int checkMovementY = y;
                 if (Console.KeyAvailable)
                 {
                     keyPressed = Console.ReadKey(false).Key;
                 }
-                xErase = x;
-                yErase = y;
-                snakeLenghtCoord[0, snakeLenght] = x;
-                snakeLenghtCoord[1, snakeLenght] = y;
 
+                
                 switch (keyPressed)
                 {
                     case ConsoleKey.RightArrow:
@@ -134,58 +138,90 @@ namespace Snake
 
                 if (right == true && x < length-3)
                 {
-                                  
+                               
                    x = x+2;                    
                 }
                 if (left == true && x > 1)
                 {
-                                  
+                          
                     x=x-2;                 
                 } 
                 if (down == true && y < hight-2)
                 {
-                                  
+                            
                     y++;                   
                 }
                 if (up == true && y > 1)
-                {                                   
+                {
+                   
                     y--;                   
                 }
                 if (foodCoord[0,0] == y && foodCoord[1,0] == x)
                 {
-                    snakeLenght++;
+                    snakeLength++;
                     foodCoord = FoodGen(hight,length);
-                    
+                    levelCount++;
+
                 }
+
                
+                    snakeCoordX.Add(x);
+                    snakeCoordY.Add(y);
+                    
                 
-                //snakeLenghtCoord[0, snakeLenght] = x;
-                //snakeLenghtCoord[1, snakeLenght] = y;
-                Snake(x, y, xErase, yErase, snakeLenght, snakeLenghtCoord);
+
+                
+                    
+                
+                
 
 
+                if ((levelCount + 1) % 6 == 0 )
+                {
+                    levelSpeed = levelSpeed - 10;
+                    levelCount = 0;
+                    level++;
+                }
+                //if (snakeCoordX.Count > snakeLength)
+                //{
+                //    snakeCoordX.RemoveAt(snakeLength);
+                //    snakeCoordY.RemoveAt(snakeLength);
+                //    count--;
+                //}
+                Snake(snakeLength,snakeCoordX,snakeCoordY,count,levelSpeed);
+                count++;
+                InfoTable(snakeLength, level);
+                
             }
         }
 
-        static void Snake (int x,int y,int xErase,int yErase, int snakeLenght, int [,]snakeLenghtCoord)
+        static void Snake(int snakeLength, List<int> snakeCoordX,List <int> snakeCoordY,int count,int levelSpeed)
         {
 
-           
+            
+            Console.SetCursorPosition(snakeCoordX[count], snakeCoordY[count]);
+            Console.Write("@");
+            Thread.Sleep(levelSpeed);
+            Console.SetCursorPosition(snakeCoordX[count - snakeLength],snakeCoordY[count - snakeLength]);
+            Console.Write("  ");
+            for (var i = 0; i < snakeCoordX.Count; i++)
+            {
+
+                
+                        Console.Write(snakeCoordX [count]);
+                    
+                
+            }
             
 
+        }
 
-
-
-
-            //Console.SetCursorPosition(xErase, yErase);
-            //Console.Write(snakeLenght);
-            //Console.SetCursorPosition(x, y);
-            //Console.Write("@");
-            //Thread.Sleep(200);
-            //Console.SetCursorPosition(xErase, yErase);
-            //Console.Write("  ");
-
-
+        static void InfoTable(int snakeLength, int level)
+        {
+            Console.SetCursorPosition(90,10);
+            Console.Write("Score: " + snakeLength);
+            Console.SetCursorPosition(90, 12);
+            Console.Write("Level: " + level);
         }
     }
 
